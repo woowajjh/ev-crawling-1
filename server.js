@@ -26,10 +26,10 @@ if (!fs.existsSync(downloadsDir)) {
 
 // 라우터 설정
 const crawlRouter = require('./routes/crawl');
-const dbRouter = require('./routes/db');
+const subsidyRouter = require('./routes/subsidy');
 
 app.use('/api/crawl', crawlRouter);
-app.use('/api/db', dbRouter);
+app.use('/api/subsidy', subsidyRouter);
 
 // 기본 라우트
 app.get('/', (req, res) => {
@@ -38,8 +38,8 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       crawl: '/api/crawl',
-      'db-test': '/api/db/test',
-      'health': '/api/health'
+      subsidy: '/api/subsidy',
+      health: '/api/health'
     },
     timestamp: new Date().toISOString()
   });
@@ -78,7 +78,7 @@ app.listen(PORT, () => {
   console.log(`🚀 EV Crawling Service running on port ${PORT}`);
   console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🔧 Crawl endpoint: http://localhost:${PORT}/api/crawl`);
-  console.log(`🗄️  DB test endpoint: http://localhost:${PORT}/api/db/test`);
+  console.log(`💰 Subsidy data endpoint: http://localhost:${PORT}/api/subsidy`);
 });
 
 module.exports = app; 

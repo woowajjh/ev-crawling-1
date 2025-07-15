@@ -358,7 +358,7 @@ async function executeCrawling() {
 }
 
 // 크롤링 실행 엔드포인트
-router.post('/', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     console.log('=== EV Crawling API Called ===');
     
