@@ -5,6 +5,187 @@
 - 모든 응답은 JSON 형태
 - 날짜 형식: ISO 8601 (예: 2025-01-01T00:00:00.000Z)
 
+## 0. 차량 모델별 보조금 조회 API (car_model_subsidies 테이블)
+
+### 0.1 전체 보조금 데이터 조회
+```
+GET /api/car-models/subsidies
+```
+
+**요청 파라미터:**
+- `year` (선택): 조회 연도 (기본값: 2025)
+- `manufacturer` (선택): 제조사 필터
+- `modelName` (선택): 모델명 필터 (부분 매칭)
+- `sido` (선택): 시도 필터
+- `regionName` (선택): 지역명 필터 (부분 매칭)
+- `vehicleType` (선택): 차종 (기본값: 전기차)
+- `sortBy` (선택): 정렬 필드 (기본값: total_subsidy)
+- `sortOrder` (선택): 정렬 순서 ASC/DESC (기본값: DESC)
+- `limit` (선택): 페이지 크기 (기본값: 50)
+- `offset` (선택): 페이지 오프셋 (기본값: 0)
+
+**사용 예시:**
+```
+GET /api/car-models/subsidies?manufacturer=현대자동차&modelName=아이오닉&limit=20
+```
+
+**응답 예시:**
+```json
+{
+  "success": true,
+  "message": "차량 모델별 보조금 조회 성공",
+  "data": [
+    {
+      "id": 1,
+      "year": 2025,
+      "sido": "서울",
+      "region_name": "서울특별시",
+      "local_code": "1100",
+      "vehicle_type": "전기차",
+      "manufacturer": "현대자동차",
+      "model_name": "아이오닉 6",
+      "national_subsidy": 2870000,
+      "local_subsidy": 640000,
+      "total_subsidy": 3510000,
+      "created_at": "2025-01-17T12:00:00.000Z",
+      "updated_at": "2025-01-17T12:00:00.000Z"
+    }
+  ],
+  "statistics": {
+    "total_count": 150,
+    "avg_national_subsidy": 2500000,
+    "avg_local_subsidy": 500000,
+    "avg_total_subsidy": 3000000,
+    "max_total_subsidy": 4000000,
+    "min_total_subsidy": 2000000,
+    "manufacturer_count": 15,
+    "model_count": 45,
+    "region_count": 160
+  },
+  "pagination": {
+    "limit": 20,
+    "offset": 0,
+    "total": 150
+  }
+}
+```
+
+### 0.2 특정 모델의 지역별 보조금 비교
+```
+GET /api/car-models/subsidies/by-model
+```
+
+**요청 파라미터:**
+- `manufacturer` (필수): 제조사명
+- `modelName` (필수): 모델명
+- `year` (선택): 조회 연도 (기본값: 2025)
+- `vehicleType` (선택): 차종 (기본값: 전기차)
+
+**사용 예시:**
+```
+GET /api/car-models/subsidies/by-model?manufacturer=현대자동차&modelName=아이오닉 6
+```
+
+**응답 예시:**
+```json
+{
+  "success": true,
+  "message": "모델별 지역 보조금 조회 성공",
+  "data": {
+    "modelInfo": {
+      "manufacturer": "현대자동차",
+      "modelName": "아이오닉 6",
+      "vehicleType": "전기차",
+      "year": 2025
+    },
+    "regionalSubsidies": [
+      {
+        "sido": "서울",
+        "region_name": "서울특별시",
+        "local_code": "1100",
+        "national_subsidy": 2870000,
+        "local_subsidy": 640000,
+        "total_subsidy": 3510000
+      }
+    ],
+    "summary": {
+      "totalRegions": 160,
+      "maxTotalSubsidy": 4000000,
+      "minTotalSubsidy": 2500000,
+      "avgTotalSubsidy": 3200000,
+      "maxLocalSubsidy": 800000,
+      "minLocalSubsidy": 100000,
+      "avgLocalSubsidy": 450000,
+      "avgNationalSubsidy": 2750000
+    },
+    "bestRegions": {
+      "highest": [],
+      "lowest": []
+    }
+  }
+}
+```
+
+### 0.3 제조사별 보조금 정보 조회
+```
+GET /api/car-models/subsidies/manufacturers
+```
+
+**요청 파라미터:**
+- `year` (선택): 조회 연도 (기본값: 2025)
+- `vehicleType` (선택): 차종 (기본값: 전기차)
+
+**응답 예시:**
+```json
+{
+  "success": true,
+  "message": "제조사별 보조금 정보 조회 성공",
+  "data": [
+    {
+      "manufacturer": "현대자동차",
+      "modelCount": 8,
+      "regionCount": 160,
+      "avgTotalSubsidy": 3200000,
+      "maxTotalSubsidy": 4000000,
+      "minTotalSubsidy": 2500000
+    }
+  ]
+}
+```
+
+### 0.4 지역별 보조금 순위 조회
+```
+GET /api/car-models/subsidies/regions
+```
+
+**요청 파라미터:**
+- `year` (선택): 조회 연도 (기본값: 2025)
+- `vehicleType` (선택): 차종 (기본값: 전기차)
+- `limit` (선택): 조회 개수 (기본값: 20)
+
+**응답 예시:**
+```json
+{
+  "success": true,
+  "message": "지역별 보조금 순위 조회 성공",
+  "data": [
+    {
+      "rank": 1,
+      "sido": "경북",
+      "regionName": "구미시",
+      "localCode": "4719",
+      "manufacturerCount": 15,
+      "modelCount": 45,
+      "avgNationalSubsidy": 2750000,
+      "avgLocalSubsidy": 800000,
+      "avgTotalSubsidy": 3550000,
+      "maxTotalSubsidy": 4200000,
+      "minTotalSubsidy": 2900000
+    }
+  ]
+}
+```
+
 ## 1. 크롤링 API
 
 ### 1.1 차종별 보조금 크롤링
