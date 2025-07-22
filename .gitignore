@@ -94,3 +94,17 @@ temp/
 lambda-build/
 ev-crawling-lambda.zip 
 *.xls
+
+# Debugging files
+debug-*.html
+debug-*.png
+debug-*.json
+debug-*.txt
+
+# Crawling result files
+crawl-*.html
+crawl-*.png
+crawl-*.json
+crawl-*.txt
+test-*.js
+test-*.html

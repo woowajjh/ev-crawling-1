@@ -44,7 +44,14 @@ const config = {
       '--single-process',
       '--no-zygote'
     ]
-  }
+  },
+  
+  // 기존 호환성을 위한 DB 설정 (기존 코드와 호환)
+  DB_HOST: process.env.DB_HOST || (process.env.NODE_ENV === 'production' ? 'damipapa-db.c7oeiia66dzx.ap-northeast-2.rds.amazonaws.com' : 'localhost'),
+  DB_PORT: process.env.DB_PORT || 3306,
+  DB_NAME: process.env.DB_DATABASE || (process.env.NODE_ENV === 'production' ? 'common-db' : 'evcar_subsidy'),
+  DB_USER: process.env.DB_USER || (process.env.NODE_ENV === 'production' ? 'admin' : 'root'),
+  DB_PASSWORD: process.env.DB_PASSWORD || (process.env.NODE_ENV === 'production' ? 'u1egRXHFxhXbf9uaL3Om' : 'password')
 };
 
 module.exports = config; 

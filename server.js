@@ -7,6 +7,10 @@ const fs = require('fs');
 // 환경 변수 로드
 dotenv.config();
 
+// 스케줄러 초기화
+const CrawlingScheduler = require('./scheduler');
+const scheduler = new CrawlingScheduler();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -27,9 +31,16 @@ if (!fs.existsSync(downloadsDir)) {
 // 라우터 설정
 const crawlRouter = require('./routes/crawl');
 const subsidyRouter = require('./routes/subsidy');
+const carModelsRouter = require('./routes/car-models');
+const { router: schedulerRouter, setSchedulerInstance } = require('./routes/scheduler');
+
+// 스케줄러 라우터에 인스턴스 주입
+setSchedulerInstance(scheduler);
 
 app.use('/api/crawl', crawlRouter);
 app.use('/api/subsidy', subsidyRouter);
+app.use('/api/car-models', carModelsRouter);
+app.use('/api/scheduler', schedulerRouter);
 
 // 기본 라우트
 app.get('/', (req, res) => {
@@ -39,6 +50,8 @@ app.get('/', (req, res) => {
     endpoints: {
       crawl: '/api/crawl',
       subsidy: '/api/subsidy',
+      carModels: '/api/car-models',
+      scheduler: '/api/scheduler',
       health: '/api/health'
     },
     timestamp: new Date().toISOString()
@@ -74,11 +87,41 @@ app.use((req, res) => {
 });
 
 // 서버 시작
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 EV Crawling Service running on port ${PORT}`);
   console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🔧 Crawl endpoint: http://localhost:${PORT}/api/crawl`);
   console.log(`💰 Subsidy data endpoint: http://localhost:${PORT}/api/subsidy`);
+  console.log(`🚗 Car models endpoint: http://localhost:${PORT}/api/car-models`);
+  console.log(`⏰ Scheduler endpoint: http://localhost:${PORT}/api/scheduler`);
+  
+  // 스케줄러 초기화
+  scheduler.initialize();
 });
+
+// Graceful shutdown
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+
+function gracefulShutdown(signal) {
+  console.log(`\n${signal} 신호를 받았습니다. 안전하게 종료합니다...`);
+  
+  // 스케줄러 종료
+  if (scheduler) {
+    scheduler.destroy();
+  }
+  
+  // 서버 종료
+  server.close(() => {
+    console.log('✅ HTTP 서버가 종료되었습니다.');
+    process.exit(0);
+  });
+  
+  // 강제 종료 (10초 후)
+  setTimeout(() => {
+    console.error('❌ 강제 종료됩니다.');
+    process.exit(1);
+  }, 10000);
+}
 
 module.exports = app; 
