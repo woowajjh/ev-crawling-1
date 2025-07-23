@@ -401,8 +401,6 @@ router.get('/subsidies', async (req, res) => {
         const yearParam = parseInt(year) || 2025;
         const vehicleTypeParam = String(vehicleType || '전기차');
         
-        console.log('API 파라미터:', { year: yearParam, vehicleType: vehicleTypeParam });
-        
         let query = `
             SELECT 
                 id, year, sido, region_name, local_code, vehicle_type, 
@@ -450,11 +448,6 @@ router.get('/subsidies', async (req, res) => {
         const offsetParam = parseInt(offset) || 0;
         params.push(limitParam, offsetParam);
         
-        console.log('최종 쿼리:', query);
-        console.log('최종 파라미터:', params);
-        console.log('파라미터 타입:', params.map(p => typeof p));
-        
-        // execute 대신 query 사용해보기
         const [rows] = await connection.query(query, params);
         
         // 통계 정보 계산
@@ -863,7 +856,7 @@ router.get('/debug/table-status', async (req, res) => {
             SHOW TABLES LIKE 'car_model_subsidies'
         `);
         
-        console.log('테이블 존재 여부:', tableExists.length > 0);
+
         
         if (tableExists.length === 0) {
             await connection.end();

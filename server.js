@@ -19,6 +19,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// 정적 파일 서빙 (개인정보처리방침 등)
+app.use(express.static('public'));
+
 // 정적 파일 제공 (다운로드된 파일들)
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 
